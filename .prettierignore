@@ -1,0 +1,9 @@
+*.js
+/node_modules
+/public/hot
+/public/css
+/public/js
+/public/node_modules
+/public/plugins
+/storage
+/vendor

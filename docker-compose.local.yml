@@ -1,0 +1,56 @@
+version: "3.9"
+
+services:
+  pro-memo-app:
+    build:
+      context: .
+      dockerfile: app.Dockerfile
+      args:
+        uid: ${UID}
+    image: pro-memo-app:latest
+    container_name: pro-memo-app
+    environment:
+      - APACHE_RUN_USER=#${UID}
+      - APACHE_RUN_GROUP=#${UID}
+    volumes:
+      - ./:/var/www/html:delegated
+      - ./docker-configs/php.ini:/usr/local/etc/php/php.ini:ro
+    ports:
+      - 8001:80
+  pro-memo-mariadb:
+    image: mariadb:10.2.40
+    container_name: pro-memo-mariadb
+    command: ['--default-time-zone=+00:00','--default-authentication-plugin=mysql_native_password']
+    ports:
+      - 3306:3306
+    environment:
+      - MARIADB_ROOT_PASSWORD=root
+    volumes:
+      - pro-memo-mariadb-data:/var/lib/mysql
+  pro-memo-phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: pro-memo-phpmyadmin
+    environment:
+      - PMA_HOST=pro-memo-mariadb
+      - PMA_USER=root
+      - PMA_PASSWORD=root
+      - UPLOAD_LIMIT=120M
+    ports:
+      - "8002:80"
+  pro-memo-mailhog:
+    image: mailhog/mailhog
+    container_name: pro-memo-mailhog
+    logging:
+      driver: 'none'  # disable saving logs
+    ports:
+      - 1025:1025 # smtp server
+      - 8003:8025
+  pro-memo-docs:
+    image: nginx
+    container_name: pro-memo-docs
+    ports:
+      - 8004:80
+    volumes:
+      - ./docs:/usr/share/nginx/html
+volumes: 
+  pro-memo-mariadb-data:

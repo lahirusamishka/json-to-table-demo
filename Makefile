@@ -9,10 +9,10 @@ export UID
 export GID
 
 shell:
-	docker-compose -f local-docker-compose.yaml exec -u ${UID}:${GID} app sh
+	docker exec -it pro-memo-app bash -c "sudo -u app-user /bin/bash"
 
 up:
-	UID=${UID} GID=${GID} docker-compose -f local-docker-compose.yaml up --build -d --remove-orphans
+	UID=${UID} GID=${GID} docker-compose -f docker-compose.local.yml up --build -d --remove-orphans
 
 down:
-	docker-compose -f local-docker-compose.yaml down --remove-orphans
+	docker-compose -f docker-compose.local.yml down --remove-orphans
